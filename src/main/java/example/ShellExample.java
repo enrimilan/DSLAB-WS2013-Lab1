@@ -100,5 +100,10 @@ public class ShellExample {
 		public long sum(int a, int b) {
 			return a + b;
 		}
+		
+		@Command("sub")
+		public long sub(int a, int b) {
+			return a - b;
+		}
 	}
 }
