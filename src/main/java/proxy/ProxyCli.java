@@ -6,7 +6,7 @@ import message.Response;
 import message.response.MessageResponse;
 
 public class ProxyCli implements IProxyCli {
-	Proxy proxy;
+	private Proxy proxy;
 	
 	public ProxyCli(Proxy proxy){
 		this.proxy = proxy;
