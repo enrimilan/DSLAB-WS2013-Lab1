@@ -9,11 +9,13 @@ public class UserInfo implements Comparable<UserInfo>, Serializable {
 	private static final long serialVersionUID = 1231468054964602727L;
 
 	private String name;
+	private String password;
 	private long credits;
 	private boolean online;
 
-	public UserInfo(String name, long credits, boolean online) {
+	public UserInfo(String name, String password, long credits, boolean online) {
 		this.name = name;
+		this.password = password;
 		this.credits = credits;
 		this.online = online;
 	}
@@ -30,6 +32,10 @@ public class UserInfo implements Comparable<UserInfo>, Serializable {
 
 	public String getName() {
 		return name;
+	}
+	
+	public String getPassword() {
+		return password;
 	}
 
 	public long getCredits() {
