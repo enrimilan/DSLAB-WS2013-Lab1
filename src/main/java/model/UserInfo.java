@@ -6,6 +6,7 @@ import java.io.Serializable;
  * Contains information about a user account.
  */
 public class UserInfo implements Comparable<UserInfo>, Serializable {
+	
 	private static final long serialVersionUID = 1231468054964602727L;
 
 	private String name;

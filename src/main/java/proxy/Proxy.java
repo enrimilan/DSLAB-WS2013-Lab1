@@ -43,7 +43,7 @@ public class Proxy implements IProxy {
 
 	@Override
 	public LoginResponse login(LoginRequest request) throws IOException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
