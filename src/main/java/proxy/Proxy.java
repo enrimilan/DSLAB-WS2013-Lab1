@@ -9,7 +9,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import cli.Shell;
 import util.Config;
 import message.Response;
 import message.request.BuyRequest;
@@ -21,25 +24,51 @@ import message.response.MessageResponse;
 import model.UserInfo;
 
 public class Proxy implements IProxy {
-	private Config config = null;
+
 	private int tcpPort;
 	private int udpPort;
 	private int fileserverTimeout;
 	private int fileserverCheckperiod;
 	private ArrayList<UserInfo> userInfos;
+	
+	private Shell shell;
+	private ExecutorService threadPool;
 
-	public Proxy(){
-		config = new Config("proxy");
+	public Proxy(Config config, Shell shell){
 		tcpPort = config.getInt("tcp.port");
 		udpPort = config.getInt("udp.port");
 		fileserverTimeout = config.getInt("fileserver.timeout");
 		fileserverCheckperiod = config.getInt("fileserver.checkPeriod");
 		ArrayList<String> usernames = retrieveUsernames();
 		retrieveUserInfo(usernames);
-
+		this.shell = shell;
+		threadPool = Executors.newCachedThreadPool();
 
 	}
-
+	
+	public void startProxy(){
+		startShell();
+		startTCPListener();
+		startUDPListener();
+	}
+	
+	private void startTCPListener(){
+		threadPool.execute(new TCPListener(tcpPort));
+		//will start to listen to tcp requests
+	}
+	
+	private void startUDPListener(){
+		//will start to listen to udp requests
+	}
+	
+	private void startShell(){
+		threadPool.execute(shell);
+	}
+	
+	public ArrayList<UserInfo> getUserInfos() {
+		return userInfos;
+	}
+	
 	@Override
 	public LoginResponse login(LoginRequest request) throws IOException {
 		

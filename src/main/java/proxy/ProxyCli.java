@@ -2,8 +2,11 @@ package proxy;
 
 import java.io.IOException;
 
+import cli.Command;
+import cli.Shell;
 import message.Response;
 import message.response.MessageResponse;
+import message.response.UserInfoResponse;
 
 public class ProxyCli implements IProxyCli {
 	private Proxy proxy;
@@ -19,9 +22,10 @@ public class ProxyCli implements IProxyCli {
 	}
 
 	@Override
+	@Command(value="users")
 	public Response users() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		Response response = new UserInfoResponse(proxy.getUserInfos());
+		return response;
 	}
 
 	@Override

@@ -7,7 +7,13 @@ import message.response.LoginResponse;
 import message.response.MessageResponse;
 
 public class ClientCli implements IClientCli {
-
+	
+	private Client client;
+	
+	public ClientCli(Client client){
+		this.client = client;
+	}
+	
 	@Override
 	public LoginResponse login(String username, String password)
 			throws IOException {
