@@ -30,7 +30,7 @@ public class Proxy implements IProxy {
 	private int fileserverTimeout;
 	private int fileserverCheckperiod;
 	private ArrayList<UserInfo> userInfos;
-	
+	private TCPListener tcpListener;
 	private Shell shell;
 	private ExecutorService threadPool;
 
@@ -45,33 +45,49 @@ public class Proxy implements IProxy {
 		threadPool = Executors.newCachedThreadPool();
 
 	}
-	
+
 	public void startProxy(){
 		startShell();
 		startTCPListener();
 		startUDPListener();
 	}
-	
+
+	public void exit(){
+		shell.close();
+		threadPool.shutdown();
+		try {
+			System.in.close();
+			if(tcpListener!=null){
+				tcpListener.stopListening();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private void startTCPListener(){
-		threadPool.execute(new TCPListener(tcpPort));
+
+		tcpListener = new TCPListener(tcpPort, this);
+		threadPool.execute(tcpListener);
 		//will start to listen to tcp requests
 	}
-	
+
 	private void startUDPListener(){
-		//will start to listen to udp requests
+		//TODO will start to listen to udp requests
 	}
-	
+
 	private void startShell(){
 		threadPool.execute(shell);
 	}
-	
+
 	public ArrayList<UserInfo> getUserInfos() {
 		return userInfos;
 	}
-	
+
 	@Override
 	public LoginResponse login(LoginRequest request) throws IOException {
-		
+
 		return null;
 	}
 

@@ -27,6 +27,6 @@ public class BuyResponse implements Response {
 
 	@Override
 	public String toString() {
-		return "!credits " + getCredits();
+		return "You now have " + getCredits()+" credits.";
 	}
 }

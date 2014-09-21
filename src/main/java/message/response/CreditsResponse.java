@@ -27,6 +27,6 @@ public class CreditsResponse implements Response {
 
 	@Override
 	public String toString() {
-		return "!credits " + getCredits();
+		return "You have " + getCredits()+" credits left.";
 	}
 }

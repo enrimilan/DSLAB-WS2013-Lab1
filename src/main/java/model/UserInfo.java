@@ -20,6 +20,10 @@ public class UserInfo implements Comparable<UserInfo>, Serializable {
 		this.credits = credits;
 		this.online = online;
 	}
+	
+	public void setCredits(long credits){
+		this.credits = credits;
+	}
 
 	@Override
 	public String toString() {

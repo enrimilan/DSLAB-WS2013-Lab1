@@ -23,15 +23,15 @@ public class ProxyCli implements IProxyCli {
 
 	@Override
 	@Command(value="users")
-	public Response users() throws IOException {
-		Response response = new UserInfoResponse(proxy.getUserInfos());
-		return response;
+	public Response users() throws IOException { 
+		return new UserInfoResponse(proxy.getUserInfos());
 	}
 
 	@Override
+	@Command(value="exit")
 	public MessageResponse exit() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		proxy.exit();
+		return new MessageResponse("Shuting down the proxy.");
 	}
 
 }

@@ -2,6 +2,7 @@ package client;
 
 import java.io.IOException;
 
+import cli.Command;
 import message.Response;
 import message.response.LoginResponse;
 import message.response.MessageResponse;
@@ -15,22 +16,23 @@ public class ClientCli implements IClientCli {
 	}
 	
 	@Override
-	public LoginResponse login(String username, String password)
+	@Command(value="login")
+	public Response login(String username, String password)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return client.login(username, password);
 	}
 
 	@Override
+	@Command(value="credits")
 	public Response credits() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return client.credits();
 	}
 
 	@Override
+	@Command(value="buy")
 	public Response buy(long credits) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return client.buy(credits);
 	}
 
 	@Override
@@ -52,15 +54,15 @@ public class ClientCli implements IClientCli {
 	}
 
 	@Override
+	@Command(value="logout")
 	public MessageResponse logout() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return client.logout();
 	}
 
 	@Override
+	@Command(value="exit")
 	public MessageResponse exit() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return client.exit();
 	}
 
 }
