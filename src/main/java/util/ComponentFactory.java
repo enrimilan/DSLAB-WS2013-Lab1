@@ -7,6 +7,8 @@ import client.IClientCli;
 import proxy.IProxyCli;
 import proxy.Proxy;
 import proxy.ProxyCli;
+import server.FileServer;
+import server.FileServerCli;
 import server.IFileServerCli;
 
 /**
@@ -54,7 +56,10 @@ public class ComponentFactory {
 	 * @throws Exception if an exception occurs
 	 */
 	public IFileServerCli startFileServer(Config config, Shell shell) throws Exception {
-		// TODO: create a new file server instance (including a Shell) and start it
-		return null;
+		FileServer fileServer = new FileServer(config, shell);
+		FileServerCli fileServerCli = new FileServerCli(fileServer);
+		shell.register(fileServerCli);
+		fileServer.startFileServer();
+		return fileServerCli;
 	}
 }
