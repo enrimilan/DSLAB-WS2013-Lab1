@@ -4,7 +4,6 @@ import message.Response;
 import message.request.DownloadFileRequest;
 import message.request.InfoRequest;
 import message.request.UploadRequest;
-import message.request.VersionRequest;
 import message.response.*;
 
 import java.io.IOException;
@@ -61,22 +60,6 @@ public interface IFileServer {
 	 * @throws IOException if an I/O error occurs
 	 */
 	Response info(InfoRequest request) throws IOException;
-
-	/**
-	 * Return the last version of the file available on this server.
-	 * E.g.:
-	 * <pre>
-	 * &gt; !version file.txt
-	 * !version 4
-	 * </pre>
-	 *
-	 * @param request the version request
-	 * @return a {@link message.response.VersionResponse VersionResponse} containing the latest file version<br/>
-	 * OR</br>
-	 * a {@link MessageResponse} if an error occurred
-	 * @throws IOException if an I/O error occurs
-	 */
-	Response version(VersionRequest request) throws IOException;
 
 	/**
 	 * Saves the file to the shared directory.
