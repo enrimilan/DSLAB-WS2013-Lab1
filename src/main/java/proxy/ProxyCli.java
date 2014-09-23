@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import cli.Command;
 import message.Response;
+import message.response.FileServerInfoResponse;
 import message.response.MessageResponse;
 import message.response.UserInfoResponse;
 
 public class ProxyCli implements IProxyCli {
 	private Proxy proxy;
-	
+
 	public ProxyCli(Proxy proxy){
 		this.proxy = proxy;
 	}
@@ -17,7 +18,7 @@ public class ProxyCli implements IProxyCli {
 	@Override
 	@Command(value="fileservers")
 	public Response fileservers() throws IOException {
-		return proxy.fileservers();
+		return new FileServerInfoResponse(proxy.getFileServerInfos());
 	}
 
 	@Override
@@ -29,8 +30,13 @@ public class ProxyCli implements IProxyCli {
 	@Override
 	@Command(value="exit")
 	public MessageResponse exit() throws IOException {
-		proxy.exit();
-		return new MessageResponse("Shuting down the proxy.");
+		proxy.getTCPListener().stopListening();
+		proxy.getUDPListener().stopListening();
+		proxy.getFileServerAliveChecker().stopChecking();
+		System.in.close();
+		proxy.getShell().close();
+		proxy.getThreadPool().shutdown();
+		return new MessageResponse("Proxy shutdown");
 	}
 
 }
