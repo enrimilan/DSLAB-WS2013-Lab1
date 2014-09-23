@@ -1,10 +1,14 @@
 package client;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
 import util.Config;
 import cli.Command;
@@ -13,9 +17,15 @@ import message.Request;
 import message.Response;
 import message.request.BuyRequest;
 import message.request.CreditsRequest;
+import message.request.DownloadFileRequest;
+import message.request.DownloadTicketRequest;
 import message.request.ExitRequest;
+import message.request.ListRequest;
 import message.request.LoginRequest;
 import message.request.LogoutRequest;
+import message.request.UploadRequest;
+import message.response.DownloadFileResponse;
+import message.response.DownloadTicketResponse;
 import message.response.MessageResponse;
 
 public class ClientCli implements IClientCli {
@@ -27,12 +37,23 @@ public class ClientCli implements IClientCli {
 	private Socket socket;
 	private ObjectInputStream inputStream = null;
 	private ObjectOutputStream outputStream = null;
+	private HashMap<String, Integer> files;
 
 	public ClientCli(Config config, Shell shell){
 		downloadDir = config.getString("download.dir");
 		proxyHost = config.getString("proxy.host");
 		proxyTcpPort = config.getInt("proxy.tcp.port");
 		this.shell = shell;
+		readFiles();
+	}
+
+	private void readFiles(){
+		files = new HashMap<String,Integer>();
+		File path = new File(downloadDir);
+		File[] filesArray = path.listFiles();
+		for(int i=0; i<filesArray.length;i++){
+			files.put(filesArray[i].getName(), 0);
+		}
 	}
 
 	public void startClient(){
@@ -58,11 +79,14 @@ public class ClientCli implements IClientCli {
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
 		inputStream = new ObjectInputStream(socket.getInputStream());
 		outputStream.writeObject(request);
+		Response response;
 		try {
-			return (Response) inputStream.readObject();
+			response = (Response) inputStream.readObject();
+
 		} catch (ClassNotFoundException e) {
 			return new MessageResponse("Something went wrong, the class does not exist.");
 		}
+		return response;
 
 	}
 
@@ -73,40 +97,81 @@ public class ClientCli implements IClientCli {
 	@Override
 	@Command(value="login")
 	public Response login(String username, String password) throws IOException{
-		LoginRequest request = new LoginRequest(username, password);
-		return sendRequest(request);
+		return sendRequest(new LoginRequest(username, password));
 	}
 
 	@Override
 	@Command(value="credits")
 	public Response credits() throws IOException{
-		CreditsRequest request = new CreditsRequest();
-		return sendRequest(request);
+		return sendRequest(new CreditsRequest());
 	}
 
 	@Override
 	@Command(value="buy")
 	public Response buy(long credits) throws IOException{
-		BuyRequest request = new BuyRequest(credits);
-		return sendRequest(request);
+		return sendRequest(new BuyRequest(credits));
 	}
 
 	@Override
+	@Command(value="list")
 	public Response list() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return sendRequest(new ListRequest());
 	}
 
 	@Override
+	@Command(value="download")
 	public Response download(String filename) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		Response response = sendRequest(new DownloadTicketRequest(filename));
+		if(response instanceof MessageResponse){
+			return response;
+		}
+		Socket socket = new Socket(((DownloadTicketResponse)response).getTicket().getAddress(),((DownloadTicketResponse)response).getTicket().getPort());
+		ObjectOutputStream objectOutputStream= new ObjectOutputStream(socket.getOutputStream());
+		ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+		objectOutputStream.writeObject(new DownloadFileRequest(((DownloadTicketResponse)response).getTicket()));
+		try {
+			response = (Response) objectInputStream.readObject();
+			if(objectOutputStream != null){
+				objectOutputStream.close();
+			}
+			if(objectInputStream != null){
+				objectInputStream.close();
+			}
+			if(socket !=null){
+				socket.close();
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		if(response instanceof MessageResponse){
+			return response;
+		}
+		else{
+			File file = new File(downloadDir + "/" + ((DownloadFileResponse)response).getTicket().getFilename());
+			file.createNewFile();
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			fileOutputStream.write(((DownloadFileResponse)response).getContent());
+			fileOutputStream.close();
+			return response;
+		}
+
 	}
 
 	@Override
+	@Command(value="upload")
 	public MessageResponse upload(String filename) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		readFiles();
+		if(files.containsKey(filename)){
+			File file = new File(downloadDir + "/" + filename);
+			FileInputStream fileInputStream = new FileInputStream(file);
+			byte[] data = new byte[ (int) file.length()];
+			fileInputStream.read(data);
+			fileInputStream.close();
+			return (MessageResponse) sendRequest(new UploadRequest(filename, files.get(filename), data));
+		}
+		else{
+			return new MessageResponse("File not found!");
+		}
 	}
 
 	@Override
@@ -119,18 +184,21 @@ public class ClientCli implements IClientCli {
 	@Override
 	@Command(value="exit")
 	public MessageResponse exit() throws IOException{
-		ExitRequest request = new ExitRequest();
-
+		outputStream = new ObjectOutputStream(socket.getOutputStream());
+		outputStream.writeObject(new ExitRequest());
+		if(socket != null){
+			socket.close();
+		}
+		if(outputStream != null){
+			socket.close();
+		}
+		if(inputStream != null){
+			socket.close();
+		}
 		shell.close();
 		System.in.close();
-		if(inputStream !=null){
-			inputStream.close();
-		}
-		if(outputStream !=null){
-			outputStream.close();
-		}
-		socket.close();
-		return (MessageResponse) sendRequest(request);
+		
+		return new MessageResponse("Client shutdown");
 	}
 
 }
