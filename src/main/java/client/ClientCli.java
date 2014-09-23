@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
@@ -38,6 +39,7 @@ public class ClientCli implements IClientCli {
 	private ObjectInputStream inputStream = null;
 	private ObjectOutputStream outputStream = null;
 	private HashMap<String, Integer> files;
+	private Thread shellThread;
 
 	public ClientCli(Config config, Shell shell){
 		downloadDir = config.getString("download.dir");
@@ -72,7 +74,8 @@ public class ClientCli implements IClientCli {
 	}
 
 	private void startShell() {
-		shell.run();
+		shellThread = new Thread(shell);
+		shellThread.start();
 	}
 
 	private Response sendRequest(Request request) throws IOException{
@@ -185,19 +188,24 @@ public class ClientCli implements IClientCli {
 	@Command(value="exit")
 	public MessageResponse exit() throws IOException{
 		outputStream = new ObjectOutputStream(socket.getOutputStream());
-		outputStream.writeObject(new ExitRequest());
+		try
+		{
+			outputStream.writeObject(new ExitRequest());
+			if(outputStream != null){
+				outputStream.close();
+			}
+		}
+		catch(SocketException e){
+		}
+		if(inputStream != null){
+			inputStream.close();
+		}
 		if(socket != null){
 			socket.close();
 		}
-		if(outputStream != null){
-			socket.close();
-		}
-		if(inputStream != null){
-			socket.close();
-		}
-		shell.close();
 		System.in.close();
-		
+		shell.close();
+
 		return new MessageResponse("Client shutdown");
 	}
 
