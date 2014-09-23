@@ -9,7 +9,7 @@ public class FileServerAliveChecker implements Runnable {
 	private int fileserverTimeout;
 	private int fileserverCheckperiod;
 	private ArrayList<FileServerInfo> fileServerInfos;
-	private boolean listening = true;
+	private boolean checking = true;
 	
 	
 	public FileServerAliveChecker(int fileserverTimeout,int fileserverCheckperiod, ArrayList<FileServerInfo> fileServerInfos) {
@@ -17,10 +17,14 @@ public class FileServerAliveChecker implements Runnable {
 		this.fileserverCheckperiod = fileserverCheckperiod;
 		this.fileServerInfos = fileServerInfos;
 	}
-
+	
+	public void stopChecking(){
+		checking = false;
+	}
+	
 	@Override
 	public void run() {
-		while(listening){
+		while(checking){
 			
 			for(int i = 0; i<fileServerInfos.size(); i++){
 				FileServerInfo fileServerInfo = fileServerInfos.get(i);
