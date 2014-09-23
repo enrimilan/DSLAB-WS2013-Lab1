@@ -139,7 +139,7 @@ public class Proxy implements IProxy {
 	}
 
 	private void startShell(){
-		//start receiving command from stdin
+		//start receiving commands from stdin
 		threadPool.execute(shell);
 	}
 
@@ -400,7 +400,7 @@ public class Proxy implements IProxy {
 		if(getCurrentUserPosition() != -1){
 			UserInfo newUserInfo = new UserInfo(getCurrentUser().getName(),getCurrentUser().getPassword(),getCurrentUser().getCredits(),false);
 			userInfos.set(getCurrentUserPosition(), newUserInfo);
-			return new MessageResponse("Logged out!");
+			return new MessageResponse("Successfully logged out.");
 		}
 		return new MessageResponse("You are not logged in!");
 	}

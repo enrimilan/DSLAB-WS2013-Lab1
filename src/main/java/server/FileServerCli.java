@@ -18,7 +18,7 @@ public class FileServerCli implements IFileServerCli {
 	public MessageResponse exit() throws IOException {
 		fileServer.getTCPListener().stopListening();
 		fileServer.getUDPPacketSender().stopSendingPackets();
-		fileServer.getShell().close();
+	    fileServer.getShell().close();
 		System.in.close();
 		fileServer.getThreadPool().shutdown();
 		return new MessageResponse("File server shutdown");

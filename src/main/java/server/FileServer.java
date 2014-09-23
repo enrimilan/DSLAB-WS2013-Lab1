@@ -140,7 +140,7 @@ public class FileServer implements IFileServer {
 		fileOutputStream.write(request.getContent());
 		fileOutputStream.close();
 		readFiles();
-		return new MessageResponse(request.getFilename() + " uploaded to fileserver.");
+		return new MessageResponse(request.getFilename() + " uploaded successfully to fileserver.");
 	}
 
 }
