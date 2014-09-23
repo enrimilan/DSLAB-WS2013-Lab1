@@ -42,6 +42,10 @@ public class FileServerInfo implements Serializable {
 	public long getUsage() {
 		return usage;
 	}
+	
+	public void increaseUsage(long usage){
+		this.usage = this.usage + usage;
+	}
 
 	public boolean isOnline() {
 		return online;
