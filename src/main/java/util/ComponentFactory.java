@@ -1,7 +1,6 @@
 package util;
 
 import cli.Shell;
-import client.Client;
 import client.ClientCli;
 import client.IClientCli;
 import proxy.IProxyCli;
@@ -24,10 +23,9 @@ public class ComponentFactory {
 	 * @throws Exception if an exception occurs
 	 */
 	public IClientCli startClient(Config config, Shell shell) throws Exception {
-		Client client = new Client(config, shell);
-		ClientCli clientCli = new ClientCli(client);
+		ClientCli clientCli = new ClientCli(config, shell);
 		shell.register(clientCli);
-		client.startClient();
+		clientCli.startClient();
 		return clientCli;
 	}
 
