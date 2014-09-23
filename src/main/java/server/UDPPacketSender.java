@@ -13,6 +13,7 @@ public class UDPPacketSender implements Runnable {
 	private int tcpPort;
 	private String proxyHost;
 	private int fileserverAlive;
+	private DatagramSocket socket;
 	private boolean sending = true;
 
 	public UDPPacketSender(int proxyUdpPort, int tcpPort, String proxyHost, int fileserverAlive){
@@ -21,11 +22,18 @@ public class UDPPacketSender implements Runnable {
 		this.proxyUdpPort = proxyUdpPort;
 		this.fileserverAlive = fileserverAlive;
 	}
+	
+	public void stopSendingPackets(){
+		if(socket != null){
+			socket.close();
+		}
+		sending = false;
+	}
 
 	@Override
 	public void run() {
 		try {
-			DatagramSocket socket = new DatagramSocket();
+			socket = new DatagramSocket();
 			while(sending){
 				String info = ""+tcpPort;
 				byte[] buf = info.getBytes();
@@ -33,18 +41,14 @@ public class UDPPacketSender implements Runnable {
 				socket.send(request);
 				Thread.sleep(fileserverAlive);
 			}
-			
+			socket.close();
 		} catch (SocketException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
