@@ -170,6 +170,7 @@ public class Shell implements Runnable, Closeable {
 	public void close() {
 		if (readMonitor != stdin) {
 			try {
+				((InputStream) readMonitor).close();
 				in.close();
 			} catch (IOException e) {
 				System.err.printf("Cannot close console input. %s: %s%n", getClass(), e.getMessage());
